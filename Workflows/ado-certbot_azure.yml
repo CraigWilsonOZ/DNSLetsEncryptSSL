@@ -1,0 +1,35 @@
+trigger:
+- none
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+- group: LetsEncrypt
+
+steps:
+- script: |
+    echo "---------------------"
+    printenv | sort
+    ls -la
+    pwd
+    echo "---------------------"
+    # Run bash script
+    chmod +x ./create-certificate-azuredns.sh
+    ./create-certificate.sh
+    echo "---------------------"
+    echo "Script debug log file"
+    echo "---------------------"
+    cat ./letsencrypt/logs/letsencrypt.log
+    echo "---------------------"
+  env:
+    # Map the pipeline variable to the script environment variable
+    clientId: $(sp-clientId)
+    clientSecret: $(sp-clientSecret)
+    tenantId: $(sp-tenantId)
+    subscriptionID: $(sp-subscriptionId)
+    domainName: $(domain)
+    emailAddress: $(emailAddress)
+    keyVaultName: $(keyVaultName)
+    resourceGroups: $(resource-group)
+  displayName: 'Lets Encrypt Certbot Certificates Creation'

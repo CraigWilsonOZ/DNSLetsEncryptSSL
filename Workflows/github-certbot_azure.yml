@@ -1,0 +1,41 @@
+name: Lets Encrypt Certificate Creation
+
+# Controls when the action will run.
+on:
+  workflow_dispatch:
+    # Allows you to run this workflow manually from the Actions tab
+
+jobs:
+  create-certificate:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up environment variables
+      run: |
+        echo "CLIENT_ID=${{ secrets.SP_CLIENTID }}" >> $GITHUB_ENV
+        echo "CLIENT_SECRET=${{ secrets.SP_CLIENTSECRET }}" >> $GITHUB_ENV
+        echo "TENANT_ID=${{ secrets.SP_TENANTID }}" >> $GITHUB_ENV
+        echo "SUBSCRIPTION_ID=${{ secrets.SP_SUBSCRIPTIONID }}" >> $GITHUB_ENV
+        echo "DOMAIN_NAME=${{ secrets.DOMAIN }}" >> $GITHUB_ENV
+        echo "EMAIL_ADDRESS=${{ secrets.EMAILADDRESS }}" >> $GITHUB_ENV
+        echo "KEYVAULT_NAME=${{ secrets.KEYVAULTNAME }}" >> $GITHUB_ENV
+        echo "RESOURCE_GROUP=${{ secrets.RESOURCE_GROUP }}" >> $GITHUB_ENV
+
+    - name: Run debug commands
+      run: |
+        echo "---------------------"
+        printenv | sort
+        ls -la
+        pwd
+        echo "---------------------"
+
+    - name: Run certificate creation script
+      run: |
+        chmod +x ./create-certificate.sh
+        ./create-certificate.sh
+
+    - name: Display script debug log file
+      run: cat ./letsencrypt/logs/letsencrypt.log
